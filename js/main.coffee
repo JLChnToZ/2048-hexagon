@@ -281,10 +281,10 @@ class Tile
 
 class HTMLActuator
   constructor: ->
-    @tileContainer = document.querySelector(".tile-container")
-    @scoreContainer = document.querySelector(".score-container")
-    @bestContainer = document.querySelector(".best-container")
-    @messageContainer = document.querySelector(".game-message")
+    @tileContainer = document.querySelector ".tile-container"
+    @scoreContainer = document.querySelector ".score-container"
+    @bestContainer = document.querySelector ".best-container"
+    @messageContainer = document.querySelector ".game-message"
     @score = 0
 
   actuate: (grid, metadata) ->
@@ -313,8 +313,8 @@ class HTMLActuator
 
   addTile: (tile) ->
     self = @
-    wrapper = document.createElement("div")
-    inner = document.createElement("div")
+    wrapper = document.createElement "div"
+    inner = document.createElement "div"
     position = tile.previousPosition or
       x: tile.x
       y: tile.y
@@ -609,19 +609,19 @@ class GameManager
           x: x
           y: y
         )
-      if tile
-        direction = 0
-        while direction < 6
-          vector = self.getVector(direction,
-            x: x
-            y: y
-          )
-          cell =
-            x: x + vector.x
-            y: y + vector.y
-          other = self.grid.cellContent(cell)
-          return yes if other and other.value is tile.value # These two tiles can be merged
-          direction++
+        if tile
+          direction = 0
+          while direction < 6
+            vector = self.getVector(direction,
+              x: x
+              y: y
+            )
+            cell =
+              x: x + vector.x
+              y: y + vector.y
+            other = self.grid.cellContent(cell)
+            return yes if other and other.value is tile.value # These two tiles can be merged
+            direction++
     no
 
   positionsEqual: (first, second) ->
