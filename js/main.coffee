@@ -101,7 +101,7 @@ class KeyboardInputManager
       modifiers = event.altKey or event.ctrlKey or event.metaKey or event.shiftKey
       mapped = verticalMap[event.which] or horizontalMap[event.which]
       unless modifiers
-        if mapped isnt undefined
+        if mapped?
           holdingKeys[event.which] = yes
           event.preventDefault()
         self.restart.bind(self) event if event.which is 32
@@ -120,7 +120,7 @@ class KeyboardInputManager
       mapped = moveMap[event.which]
       unless modifiers
         holdingKeys[event.which] = no if holdingKeys[event.which]
-        if mapped isnt undefined
+        if mapped?
           event.preventDefault()
           self.emit "move", mapped
         else
@@ -131,9 +131,9 @@ class KeyboardInputManager
               key = t
             j++
           if i is 0
-            self.emit "move", horizontalMap[event.which] if j is 1 and horizontalMap[event.which] isnt undefined
+            self.emit "move", horizontalMap[event.which] if j is 1 and horizontalMap[event.which]?
             delete holdingKeys[t] for t of holdingKeys if j > 0
-          else if i is 1 and ((verticalMap[key] isnt undefined and horizontalMap[event.which] isnt undefined) or (horizontalMap[key] isnt undefined and verticalMap[event.which] isnt undefined))
+          else if i is 1 and ((verticalMap[key]? and horizontalMap[event.which]?) or (horizontalMap[key]? and verticalMap[event.which]?))
             direction = detectDirection key, event.which
             event.preventDefault()
             self.emit "move", direction
@@ -172,7 +172,7 @@ class KeyboardInputManager
           direction = if dx > 0 then 3 else 2
         when angle < -60 + delta and angle > -60 - delta
           direction = if dx > 0 then 4 else 5
-      self.emit "move", direction if direction isnt undefined
+      self.emit "move", direction if direction?
       return
     return
 
@@ -322,7 +322,7 @@ class HTMLActuator
     # We can't use classlist because it somehow glitches when replacing classes
     classes = [
       "tile"
-      "tile-" + tile.value
+      "tile-#{tile.value}"
       positionClass
     ]
     classes.push "tile-super" if tile.value > 2048
@@ -610,8 +610,7 @@ class GameManager
           y: y
         )
         if tile
-          direction = 0
-          while direction < 6
+          for direction in [0...6]
             vector = self.getVector(direction,
               x: x
               y: y
@@ -619,7 +618,7 @@ class GameManager
             cell =
               x: x + vector.x
               y: y + vector.y
-            other = self.grid.cellContent(cell)
+            other = self.grid.cellContent cell
             return yes if other and other.value is tile.value # These two tiles can be merged
             direction++
     no
