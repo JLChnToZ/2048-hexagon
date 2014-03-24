@@ -24,6 +24,17 @@ unless window.cancelAnimationFrame
     clearTimeout id
     return
 
+window.fakeStorage =
+  _data: {}
+  setItem: (id, val) ->
+    return_data[id] = String(val)
+  getItem: (id) ->
+    if @_data.hasOwnProperty(id) then @_data[id] else undefined
+  removeItem: (id) ->
+    delete @_data[id]
+  clear: ->
+    return_data = {}
+
 class LocalScoreManager
   constructor: ->
     @key = "bestScore"
@@ -45,17 +56,6 @@ class LocalScoreManager
   set: (score) ->
     @storage.setItem @key, score
     return
-
-window.fakeStorage =
-  _data: {}
-  setItem: (id, val) ->
-    return_data[id] = String(val)
-  getItem: (id) ->
-    (if @_data.hasOwnProperty(id) then @_data[id] else `undefined`)
-  removeItem: (id) ->
-    delete @_data[id]
-  clear: ->
-    return_data = {}
 
 class KeyboardInputManager
   constructor : ->
@@ -237,13 +237,13 @@ class Grid
 
   # Check if the specified cell is taken
   cellAvailable: (cell) ->
-    not @cellOccupied(cell)
+    not @cellOccupied cell
 
   cellOccupied: (cell) ->
-    !!@cellContent(cell)
+    !!@cellContent cell
 
   cellContent: (cell) ->
-    if @withinBounds(cell) then @cells[cell.x][cell.y] else null
+    if @withinBounds cell then @cells[cell.x][cell.y] else null
 
   # Inserts a tile at its position
   insertTile: (tile) ->
@@ -587,7 +587,7 @@ class GameManager
   findFarthestPosition: (cell, direction) ->
     # Progress towards the vector direction until an obstacle is found
     loop
-      vector = @getVector(direction, cell)
+      vector = @getVector direction, cell
       previous = cell
       cell =
         x: previous.x + vector.x
