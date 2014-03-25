@@ -162,9 +162,12 @@ class KeyboardInputManager
       dy = event.changedTouches[0].clientY - touchStartClientY
       angle = Math.atan(dy / dx) / Math.PI * 180
       delta = 20
-      direction = if dx > 0 then 1 else 0 if  0 - delta < angle < 0 + delta
-      direction = if dx > 0 then 3 else 2 if  60 - delta < angle < 60 + delta
-      direction = if dx > 0 then 4 else 5 if  -60 - delta < angle < -60 + delta
+      if 0 - delta < angle < 0 + delta
+        direction = if dx > 0 then 1 else 0
+      else if 60 - delta < angle < 60 + delta
+        direction = if dx > 0 then 3 else 2
+      else if -60 - delta < angle < -60 + delta
+        direction = if dx > 0 then 4 else 5
       self.emit "move", direction if direction?
       return
     return
