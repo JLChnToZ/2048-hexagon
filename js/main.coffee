@@ -251,7 +251,7 @@ class Grid
     return
 
   withinBounds: (position) ->
-    position.x >= 0 and position.x < @size - Math.abs(position.y - 2) and position.y >= 0 and position.y < @size
+    position.x >= 0 and position.x < @size - Math.abs(position.y - 2) and position.y >= 0 and position.y < @size and (position.x isnt 2 or position.y isnt 2)
 
 class Tile
   constructor: (position, value) ->
@@ -321,7 +321,21 @@ class HTMLActuator
     classes.push "tile-super" if tile.value > 2048
     @applyClasses wrapper, classes
     inner.classList.add "tile-inner"
-    inner.textContent = tile.value
+    inner.textContent = ((value) ->
+      switch value
+        when 16
+          "拾陸"
+        when 32
+          "参拾貳"
+        when 64
+          "陸拾肆"
+        else
+          ret = ""
+          num_text = "零壹貳参肆伍陸柒捌玖"
+          str = value.toString()
+          ret += num_text[parseInt c] for c, i in str
+          ret
+    )(tile.value)
     if tile.previousPosition
       # Make sure that the tile gets rendered in the previous position first
       window.requestAnimationFrame ->
@@ -444,7 +458,9 @@ class GameManager
     if @grid.cellsAvailable()
       rand = Math.random()
       n = 0
-      pvalues = Math.pow 2, i if cell % 2 isnt 0 or Math.pow(2, i) >= @maxNum / Math.pow(@maxNum, 0.7) / 2 for cell, i in @grid.cellCount
+      pvalues = []
+      for cell, i in @grid.cellCount
+        pvalues.push Math.pow 2, i if cell % 2 isnt 0 or Math.pow(2, i) >= @maxNum / Math.pow(@maxNum, 0.7) / 2
       value = pvalues[0]
       for pvalue, i in pvalues
         n += 0.9 * Math.pow 10, i + 1
