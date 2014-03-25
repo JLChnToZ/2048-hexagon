@@ -29,7 +29,7 @@ window.fakeStorage =
   setItem: (id, val) ->
     return_data[id] = String(val)
   getItem: (id) ->
-    if @_data.hasOwnProperty(id) then @_data[id] else undefined
+    if @_data.hasOwnProperty id then @_data[id] else undefined
   removeItem: (id) ->
     delete @_data[id]
   clear: ->
@@ -159,19 +159,12 @@ class KeyboardInputManager
     gameContainer.addEventListener "touchend", (event) ->
       return if event.touches.length > 0
       dx = event.changedTouches[0].clientX - touchStartClientX
-      absDx = Math.abs dx
       dy = event.changedTouches[0].clientY - touchStartClientY
-      absDy = Math.abs dy
-      tan = dy / dx
       angle = Math.atan(dy / dx) / Math.PI * 180
       delta = 20
-      switch yes
-        when angle < 0 + delta and angle > 0 - delta
-          direction = if dx > 0 then 1 else 0
-        when angle < 60 + delta and angle > 60 - delta
-          direction = if dx > 0 then 3 else 2
-        when angle < -60 + delta and angle > -60 - delta
-          direction = if dx > 0 then 4 else 5
+      direction = if dx > 0 then 1 else 0 if  0 - delta < angle < 0 + delta
+      direction = if dx > 0 then 3 else 2 if  60 - delta < angle < 60 + delta
+      direction = if dx > 0 then 4 else 5 if  -60 - delta < angle < -60 + delta
       self.emit "move", direction if direction?
       return
     return
@@ -493,6 +486,7 @@ class GameManager
     return if @isGameTerminated() # Don't do anything if the game's over
     traversals = @buildTraversals direction
     moved = no
+    mergeCount = 0
     # Save the current tile positions and remove merger information
     @prepareTiles()
     # Traverse the grid in the right direction and move tiles
@@ -513,6 +507,8 @@ class GameManager
             # Update the score
             self.score += merged.value
             self.maxNum = Math.max self.maxNum, merged.value
+            # Count the merging action.
+            mergeCount++
             # The mighty 2048 tile
             self.won = yes if merged.value is 2048
           else self.moveTile tile, positions.farthest
@@ -520,7 +516,7 @@ class GameManager
         return
       return
     if moved
-      @addRandomTile()
+      @addRandomTile() if mergeCount <= 1
       @addRandomTile() if Math.random() > 0.25
       @over = yes unless @movesAvailable() # Game over!
       @actuate()
