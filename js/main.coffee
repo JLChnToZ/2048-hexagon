@@ -251,7 +251,7 @@ class Grid
     return
 
   withinBounds: (position) ->
-    position.x >= 0 and position.x < @size - Math.abs(position.y - 2) and position.y >= 0 and position.y < @size and (position.x isnt 2 or position.y isnt 2)
+    position.x >= 0 and position.x < @size - Math.abs(position.y - 2) and position.y >= 0 and position.y < @size
 
 class Tile
   constructor: (position, value) ->
