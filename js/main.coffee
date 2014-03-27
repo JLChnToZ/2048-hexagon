@@ -168,7 +168,7 @@ class KeyboardInputManager
       return if event.touches.length > 1
       dx = event.changedTouches[0].clientX - touchStartClientX
       dy = event.changedTouches[0].clientY - touchStartClientY
-      if Math.sqrt(dx * dx + dy * dy) >= 58
+      if Math.sqrt(dx * dx + dy * dy) >= 115
         if handleTouch dx, dy
           touchStartClientX += dx
           touchStartClientY += dy
