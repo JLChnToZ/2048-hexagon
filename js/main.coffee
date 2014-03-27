@@ -153,15 +153,9 @@ class KeyboardInputManager
       touchStartClientY = event.touches[0].clientY
       event.preventDefault()
       return
-    gameContainer.addEventListener "touchmove", (event) ->
-      event.preventDefault()
-      return
-    gameContainer.addEventListener "touchend", (event) ->
-      return if event.touches.length > 0
-      dx = event.changedTouches[0].clientX - touchStartClientX
-      dy = event.changedTouches[0].clientY - touchStartClientY
+    handleTouch = (dx, dy) ->
       angle = Math.atan(dy / dx) / Math.PI * 180
-      delta = 20
+      delta = 30
       if 0 - delta < angle < 0 + delta
         direction = if dx > 0 then 1 else 0
       else if 60 - delta < angle < 60 + delta
@@ -169,6 +163,22 @@ class KeyboardInputManager
       else if -60 - delta < angle < -60 + delta
         direction = if dx > 0 then 4 else 5
       self.emit "move", direction if direction?
+      direction?
+    gameContainer.addEventListener "touchmove", (event) ->
+      return if event.touches.length > 1
+      dx = event.changedTouches[0].clientX - touchStartClientX
+      dy = event.changedTouches[0].clientY - touchStartClientY
+      if Math.sqrt(dx * dx + dy * dy) >= 58
+        if handleTouch dx, dy
+          touchStartClientX += dx
+          touchStartClientY += dy
+      event.preventDefault()
+      return
+    gameContainer.addEventListener "touchend", (event) ->
+      return if event.touches.length > 0
+      dx = event.changedTouches[0].clientX - touchStartClientX
+      dy = event.changedTouches[0].clientY - touchStartClientY
+      handleTouch dx, dy
       return
     return
 
@@ -229,14 +239,14 @@ class Grid
 
   # Check if there are any cells available
   cellsAvailable: ->
-    !!@availableCells().length
+    @availableCells().length > 0
 
   # Check if the specified cell is taken
   cellAvailable: (cell) ->
     not @cellOccupied cell
 
   cellOccupied: (cell) ->
-    !!@cellContent cell
+    (@cellContent cell)?
 
   cellContent: (cell) ->
     if @withinBounds cell then @cells[cell.x][cell.y] else null
@@ -400,7 +410,7 @@ class HTMLActuator
 
   message: (won) ->
     type = if won then "game-won" else "game-over"
-    message = if won then "You win!" else "Game over!"
+    message = if won then "及格！" else "不夠多！"
     @messageContainer.classList.add type
     @messageContainer.getElementsByTagName("p")[0].textContent = message
     return
